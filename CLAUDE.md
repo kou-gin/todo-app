@@ -49,4 +49,7 @@ Single-page app with no framework or bundler. Three files do all the work:
 
 ## デプロイ
 
-GitHub Pages への公開は未実施。手順は `README.md` に記載済み。公開するには git リポジトリの作成が必要。
+- リポジトリ: https://github.com/kou-gin/todo-app
+- GitHub Pages: Settings → Pages → Branch: main / (root) で有効化（初回のみ手動設定が必要）
+- 公開URL（有効化後）: https://kou-gin.github.io/todo-app/
+- `main` ブランチへの push で自動反映される
