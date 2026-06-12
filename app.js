@@ -143,17 +143,34 @@ function importTasks(e){
     try {
       const imported = JSON.parse(ev.target.result)
       if(typeof imported !== 'object' || Array.isArray(imported)) throw new Error('invalid format')
-      let added = 0
+      let added = 0, updated = 0, skipped = 0
       Object.values(imported).forEach(task => {
         if(typeof task !== 'object' || !task.title) return
-        // 重複IDは新規発行
-        const id = (task.id && !state.tasks[task.id]) ? task.id : uid()
-        state.tasks[id] = {...task, id}
-        added++
+        const id = task.id
+        if(id && state.tasks[id]){
+          // ID衝突: updatedAt が新しい方を採用
+          const existingAt = state.tasks[id].updatedAt || ''
+          const importedAt = task.updatedAt || ''
+          if(importedAt > existingAt){
+            state.tasks[id] = {...task, id}
+            updated++
+          } else {
+            skipped++
+          }
+        } else {
+          // 新規追加（IDなし or 衝突なし）
+          const newId = id || uid()
+          state.tasks[newId] = {...task, id: newId}
+          added++
+        }
       })
       saveState()
       renderTasks()
-      alert(`${added}件のタスクをインポートしました。`)
+      const parts = []
+      if(added)   parts.push(`${added}件追加`)
+      if(updated) parts.push(`${updated}件上書き`)
+      if(skipped) parts.push(`${skipped}件スキップ`)
+      alert(`インポート完了: ${parts.join('、') || '変更なし'}`)
     } catch {
       alert('インポートに失敗しました。有効なJSONファイルを選択してください。')
     } finally {
@@ -250,7 +267,7 @@ function onSaveTask(e){
     }),
     attachments: [],
     completed: false,
-    createdAt: nowISO(),
+    createdAt: (editingId && state.tasks[editingId]?.createdAt) || nowISO(),
     updatedAt: nowISO()
   }
   // files
