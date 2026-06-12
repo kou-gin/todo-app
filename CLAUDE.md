@@ -39,6 +39,21 @@ Single-page app with no framework or bundler. Three files do all the work:
 - レスポンシブ：800px以下でサイドバーをハンバーガーメニュー化
 - 添付ファイル：画像はインラインプレビュー、PDFは別タブ表示、その他はダウンロードリンク
 
+## モバイル対応の実装詳細
+
+- ブレークポイントは `max-width: 800px`
+- モバイル時、`#sidebar` は `display:none`。`☰` ボタン（`#mobileMenuBtn`）は `#main .topbar` 内に配置（サイドバー内に置くと一緒に非表示になるため）
+- ボタン押下で `#app` に `.mobile-open` クラスを付与 → `#sidebar` を `position:fixed` でオーバーレイ表示
+- 背景の暗幕は `<div id="sidebarOverlay">` （実DOMノード）で実装。`::after` 疑似要素はJSのクリックイベントを受け取れないため使用不可
+- カテゴリ・フィルター選択時も `closeSidebar()` を呼んで自動的に閉じる
+
+## データ同期の制限
+
+- データは `localStorage` に保存されるため、**デバイス・ブラウザをまたいだ同期は不可**
+- PCとスマホでデータは独立している（設計上の制限、バグではない）
+- クラウド同期が必要な場合は Firebase / Supabase 等のバックエンド導入が必要（現状は未実装）
+- 手動同期のみ対応予定であればエクスポート/インポート機能（JSON）の追加で対応可能
+
 ## 既知の修正済み問題
 
 以下は過去に修正済み（再発した場合は要注意）：
@@ -46,6 +61,7 @@ Single-page app with no framework or bundler. Three files do all the work:
 - **ダークモード時のカレンダー色**: `#f3f4f6` 等のハードコード色を `--cal-head` / `--cal-border` / `--cal-border2` 変数に置き換え済み
 - **タグフィルターの部分一致**: タスクに複数タグがある場合、最初の1つしか絞り込まれなかった問題を修正。タグごとに個別スパンを生成し、各クリックで対応タグでフィルタされる
 - **繰り返しタスクの重複リスナー**: `document.addEventListener('change', ...)` のグローバルデリゲートと `renderTaskItem` 内のリスナーが二重登録されていた問題を解消。繰り返しロジックを `renderTaskItem` 内に統合し、グローバルリスナーを削除済み
+- **モバイルメニューが閉じない**: `::after` 疑似要素ではクリックイベントが取れなかったため、実DOMの `#sidebarOverlay` に置き換えて解消済み
 
 ## デプロイ
 
