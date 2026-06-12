@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Todo App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" class="light">
+    <aside id="sidebar">
+      <div class="brand">
+        <h1>Todo</h1>
+        <div class="brand-actions">
+          <button id="mobileMenuBtn" class="mobile-only" title="メニュー">☰</button>
+          <button id="toggleTheme" title="Toggle dark mode">🌙</button>
+        </div>
+      </div>
+      <div class="search">
+        <input id="searchInput" placeholder="検索、タグ、メモ..." />
+      </div>
+      <div class="categories">
+        <h3>カテゴリ</h3>
+        <ul id="categoryList"></ul>
+        <div class="category-actions">
+          <input id="newCategoryInput" placeholder="新しいカテゴリ" />
+          <button id="addCategoryBtn">追加</button>
+        </div>
+      </div>
+      <div class="filters">
+        <h3>フィルター</h3>
+        <button data-filter="all" class="filter active">すべて</button>
+        <button data-filter="today" class="filter">今日</button>
+        <button data-filter="overdue" class="filter">期限超過</button>
+        <button data-filter="completed" class="filter">完了</button>
+      </div>
+      <div class="tags">
+        <h3>タグ</h3>
+        <div id="tagList"></div>
+      </div>
+    </aside>
+
+    <main id="main">
+      <header class="topbar">
+        <div class="left">
+          <button id="addTaskBtn">＋ タスク追加</button>
+        </div>
+        <div class="right">
+          <label class="calendar-toggle"><input type="checkbox" id="calendarToggle" /> カレンダー</label>
+          <div class="calendar-mode">
+            表示:
+            <select id="calendarMode">
+              <option value="month">月</option>
+              <option value="week">週</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <section id="content">
+        <div id="calendarView" class="hidden"></div>
+        <div id="taskListArea">
+          <ul id="taskList"></ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Task editor modal -->
+  <div id="editorModal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="editorTitle">タスクを追加</h2>
+      <form id="taskForm">
+        <label>タイトル<input id="taskTitle" required /></label>
+        <label>メモ<textarea id="taskNote"></textarea></label>
+        <label>期限<input id="taskDue" type="datetime-local" /></label>
+        <label>繰り返し
+          <select id="taskRepeat">
+            <option value="none">なし</option>
+            <option value="daily">毎日</option>
+            <option value="weekly">毎週</option>
+            <option value="monthly">毎月</option>
+          </select>
+        </label>
+        <label>優先度
+          <select id="taskPriority">
+            <option value="low">低</option>
+            <option value="medium" selected>中</option>
+            <option value="high">高</option>
+          </select>
+        </label>
+        <label>カテゴリ
+          <select id="taskCategory"></select>
+        </label>
+        <label>タグ (カンマ区切り)<input id="taskTags" placeholder="例: urgent,home" /></label>
+        <label>添付ファイル<input id="taskFiles" type="file" multiple /></label>
+        <div class="subtasks">
+          <h4>サブタスク</h4>
+          <ul id="subtaskList"></ul>
+          <input id="newSubtaskInput" placeholder="サブタスクを追加" />
+          <button id="addSubtaskBtn" type="button">追加</button>
+        </div>
+        <div class="modal-actions">
+          <button type="submit">保存</button>
+          <button id="cancelEdit" type="button">キャンセル</button>
+          <button id="deleteTaskBtn" type="button" class="danger hidden">削除</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
