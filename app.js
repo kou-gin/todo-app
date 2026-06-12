@@ -100,13 +100,14 @@ function bindEvents(){
   if(themeBtn) themeBtn.addEventListener('click', toggleTheme)
   // mobile menu
   const mobileBtn = $id('mobileMenuBtn')
-  if(mobileBtn) mobileBtn.addEventListener('click', ()=> document.getElementById('app').classList.toggle('mobile-open'))
-  // close sidebar when clicking the dark overlay
-  document.addEventListener('click', e=>{
-    const app = document.getElementById('app')
-    if(app.classList.contains('mobile-open') && !e.target.closest('#sidebar') && e.target !== mobileBtn)
-      app.classList.remove('mobile-open')
-  })
+  const overlay = $id('sidebarOverlay')
+  function openSidebar(){ document.getElementById('app').classList.add('mobile-open'); overlay.classList.remove('hidden') }
+  function closeSidebar(){ document.getElementById('app').classList.remove('mobile-open'); overlay.classList.add('hidden') }
+  if(mobileBtn) mobileBtn.addEventListener('click', ()=> document.getElementById('app').classList.contains('mobile-open') ? closeSidebar() : openSidebar())
+  if(overlay) overlay.addEventListener('click', closeSidebar)
+  // close sidebar when a category or filter is selected on mobile
+  document.getElementById('categoryList').addEventListener('click', closeSidebar)
+  document.querySelectorAll('#sidebar .filters .filter').forEach(btn=> btn.addEventListener('click', closeSidebar))
   // sidebar filter buttons (all/today/overdue/completed)
   document.querySelectorAll('#sidebar .filters .filter').forEach(btn=>{
     btn.addEventListener('click', ()=>{
