@@ -38,6 +38,7 @@ Single-page app with no framework or bundler. Three files do all the work:
 - ダークモード：トグルボタン、設定を `localStorage` で永続化
 - レスポンシブ：800px以下でサイドバーをハンバーガーメニュー化
 - 添付ファイル：画像はインラインプレビュー、PDFは別タブ表示、その他はダウンロードリンク
+- エクスポート/インポート：タスクをJSONファイルで書き出し・読み込み（`updatedAt` による上書き判定付き）
 
 ## モバイル対応の実装詳細
 
@@ -53,6 +54,31 @@ Single-page app with no framework or bundler. Three files do all the work:
 - PCとスマホでデータは独立している（設計上の制限、バグではない）
 - クラウド同期が必要な場合は Firebase / Supabase 等のバックエンド導入が必要（現状は未実装）
 - エクスポート/インポート機能（JSON）により、デバイス間の手動データ移行が可能
+
+## タスクデータ構造
+
+各タスクは `state.tasks` に `{ [id]: taskObject }` の辞書形式で格納される（配列ではない）。
+
+```js
+{
+  id:         "lf3k2abc",          // uid() で生成（タイムスタンプ36進 + ランダム4文字）
+  title:      "タスクのタイトル",
+  note:       "メモ",
+  due:        "2026-06-15T09:00:00.000Z",  // null も可
+  repeat:     "none",              // "none" | "daily" | "weekly" | "monthly"
+  priority:   "medium",            // "low" | "medium" | "high"
+  categoryId: "lf2xqrst",         // state.categories の id
+  tags:       ["urgent", "home"],
+  subtasks:   [{ id, title, done }],
+  attachments:[{ name, data }],    // data は Base64 DataURL
+  completed:  false,
+  createdAt:  "2026-06-12T10:00:00.000Z",
+  updatedAt:  "2026-06-12T10:00:00.000Z"
+}
+```
+
+- `id` はアプリ内で唯一の識別子。タスクNoのような連番は存在しない
+- `updatedAt` はタスク保存のたびに `nowISO()` で更新される。インポート時の上書き判定にも使用
 
 ## エクスポート/インポート機能
 
@@ -70,6 +96,7 @@ Single-page app with no framework or bundler. Three files do all the work:
 - **タグフィルターの部分一致**: タスクに複数タグがある場合、最初の1つしか絞り込まれなかった問題を修正。タグごとに個別スパンを生成し、各クリックで対応タグでフィルタされる
 - **繰り返しタスクの重複リスナー**: `document.addEventListener('change', ...)` のグローバルデリゲートと `renderTaskItem` 内のリスナーが二重登録されていた問題を解消。繰り返しロジックを `renderTaskItem` 内に統合し、グローバルリスナーを削除済み
 - **モバイルメニューが閉じない**: `::after` 疑似要素ではクリックイベントが取れなかったため、実DOMの `#sidebarOverlay` に置き換えて解消済み
+- **タスク編集時に `createdAt` が上書きされる**: `onSaveTask` で常に `nowISO()` を設定していたため、編集のたびに作成日時が更新されていた。編集時は既存の `createdAt` を引き継ぐよう修正済み
 
 ## デプロイ
 
