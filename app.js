@@ -118,6 +118,49 @@ function bindEvents(){
       else renderTasks({filter: f})
     })
   })
+  // export / import
+  $id('exportBtn').addEventListener('click', exportTasks)
+  $id('importBtn').addEventListener('click', ()=> $id('importFile').click())
+  $id('importFile').addEventListener('change', importTasks)
+}
+
+function exportTasks(){
+  const date = new Date().toISOString().slice(0,10)
+  const json = JSON.stringify(state.tasks, null, 2)
+  const blob = new Blob([json], {type:'application/json'})
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `todo-export-${date}.json`
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
+function importTasks(e){
+  const file = e.target.files[0]
+  if(!file) return
+  const reader = new FileReader()
+  reader.onload = ev => {
+    try {
+      const imported = JSON.parse(ev.target.result)
+      if(typeof imported !== 'object' || Array.isArray(imported)) throw new Error('invalid format')
+      let added = 0
+      Object.values(imported).forEach(task => {
+        if(typeof task !== 'object' || !task.title) return
+        // 重複IDは新規発行
+        const id = (task.id && !state.tasks[task.id]) ? task.id : uid()
+        state.tasks[id] = {...task, id}
+        added++
+      })
+      saveState()
+      renderTasks()
+      alert(`${added}件のタスクをインポートしました。`)
+    } catch {
+      alert('インポートに失敗しました。有効なJSONファイルを選択してください。')
+    } finally {
+      e.target.value = ''
+    }
+  }
+  reader.readAsText(file)
 }
 
 // Categories
