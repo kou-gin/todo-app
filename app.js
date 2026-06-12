@@ -100,7 +100,13 @@ function bindEvents(){
   if(themeBtn) themeBtn.addEventListener('click', toggleTheme)
   // mobile menu
   const mobileBtn = $id('mobileMenuBtn')
-  if(mobileBtn) mobileBtn.addEventListener('click', ()=> document.getElementById('app').classList.toggle('mobile'))
+  if(mobileBtn) mobileBtn.addEventListener('click', ()=> document.getElementById('app').classList.toggle('mobile-open'))
+  // close sidebar when clicking the dark overlay
+  document.addEventListener('click', e=>{
+    const app = document.getElementById('app')
+    if(app.classList.contains('mobile-open') && !e.target.closest('#sidebar') && e.target !== mobileBtn)
+      app.classList.remove('mobile-open')
+  })
   // sidebar filter buttons (all/today/overdue/completed)
   document.querySelectorAll('#sidebar .filters .filter').forEach(btn=>{
     btn.addEventListener('click', ()=>{
