@@ -1,0 +1,19 @@
+# environment variables
+.env
+.env.*
+.env.production
+
+# security
+*.pem
+*.key
+secrets/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+
+# macOS-specific files
+.DS_Store
